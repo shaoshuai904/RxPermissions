@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply from: 'jitpack.gradle'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 11
+        targetSdkVersion 26
     }
     buildTypes {
         release {
@@ -25,15 +25,15 @@ android {
 }
 
 dependencies {
-    implementation rootProject.ext.rxJava
-    implementation rootProject.ext.supportAnnotations
-    implementation rootProject.ext.supportFragment
+    implementation "com.android.support:support-annotations:28.0.0"
+    implementation "com.android.support:support-fragment:28.0.0"
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.3'
 
-    testImplementation rootProject.ext.junit
-    testImplementation rootProject.ext.mockito
-    testImplementation rootProject.ext.robolectric
-    testImplementation rootProject.ext.robolectricShadowsSupport
-    testImplementation rootProject.ext.khronosOpenGLApi
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.19.0'
+    testImplementation "org.robolectric:robolectric:3.4.2"
+    testImplementation "org.robolectric:shadows-support-v4:3.3.2"
+    testImplementation "org.khronos:opengl-api:gl1.1-android-2.1_r1"
 }
 
 // Commented to use JitPack instead of bintray
