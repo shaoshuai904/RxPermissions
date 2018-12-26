@@ -1,17 +1,3 @@
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.tbruyelle.rxpermissions2;
 
 import android.annotation.TargetApi;
@@ -34,7 +20,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.subjects.PublishSubject;
 
 public class RxPermissions {
-
     static final String TAG = RxPermissions.class.getSimpleName();
     static final Object TRIGGER = new Object();
 
@@ -263,11 +248,9 @@ public class RxPermissions {
     }
 
     /**
-     * Invokes Activity.shouldShowRequestPermissionRationale and wraps
-     * the returned value in an observable.
+     * Invokes Activity.neverAskAgain and wraps the returned value in an observable.
      * <p>
-     * In case of multiple permissions, only emits true if
-     * Activity.shouldShowRequestPermissionRationale returned true for
+     * In case of multiple permissions, only emits true if Activity.neverAskAgain returned true for
      * all revoked permissions.
      * <p>
      * You shouldn't call this method if all permissions have been granted.
@@ -299,9 +282,10 @@ public class RxPermissions {
     }
 
     /**
-     * Returns true if the permission is already granted.
+     * 是否同意权限
+     * 如果已授予权限，则返回true。
      * <p>
-     * Always true if SDK &lt; 23.
+     * 如果 SDK < 23. 始终为 true
      */
     @SuppressWarnings("WeakerAccess")
     public boolean isGranted(String permission) {
@@ -309,15 +293,17 @@ public class RxPermissions {
     }
 
     /**
-     * Returns true if the permission has been revoked by a policy.
+     * 是否撤销权限
+     * 如果权限已经杯策略撤销，则返回true。
      * <p>
-     * Always false if SDK &lt; 23.
+     * 如果 SDK < 23. 始终为 false
      */
     @SuppressWarnings("WeakerAccess")
     public boolean isRevoked(String permission) {
         return isMarshmallow() && mRxPermissionsFragment.get().isRevoked(permission);
     }
 
+    // SDK >= 23
     boolean isMarshmallow() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }

@@ -87,7 +87,7 @@ rxPermissions
     .subscribe(permission -> { // will emit 2 Permission objects
         if (permission.granted) {
            // `permission.name` is granted !
-        } else if (permission.shouldShowRequestPermissionRationale) {
+        } else if (permission.neverAskAgain) {
            // Denied permission without ask never again
         } else {
            // Denied permission with ask never again
@@ -105,7 +105,7 @@ rxPermissions
     .subscribe(permission -> { // will emit 1 Permission object
         if (permission.granted) {
            // All permissions are granted !
-        } else if (permission.shouldShowRequestPermissionRationale)
+        } else if (permission.neverAskAgain)
            // At least one denied permission without ask never again
         } else {
            // At least one denied permission with ask never again

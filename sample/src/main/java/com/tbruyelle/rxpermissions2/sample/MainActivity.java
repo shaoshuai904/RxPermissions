@@ -19,9 +19,6 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String TAG = "RxPermissionsSample";
-
     private Camera camera;
     private SurfaceView surfaceView;
     private Disposable disposable;
@@ -41,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Consumer<Permission>() {
                                @Override
                                public void accept(Permission permission) {
-                                   Log.i(TAG, "Permission result " + permission);
+                                   Log.e("  --MainActivity--  ", " Permission result " + permission);
                                    if (permission.granted) {
                                        releaseCamera();
                                        camera = Camera.open(0);
@@ -49,32 +46,25 @@ public class MainActivity extends AppCompatActivity {
                                            camera.setPreviewDisplay(surfaceView.getHolder());
                                            camera.startPreview();
                                        } catch (IOException e) {
-                                           Log.e(TAG, "Error while trying to display the camera preview", e);
+                                           Log.e("  --MainActivity--  ", " Error while trying to display the camera preview", e);
                                        }
-                                   } else if (permission.shouldShowRequestPermissionRationale) {
-                                       // Denied permission without ask never again
-                                       Toast.makeText(MainActivity.this,
-                                               "Denied permission without ask never again",
-                                               Toast.LENGTH_SHORT).show();
+                                   } else if (permission.neverAskAgain) {
+                                       showToast("拒绝许可，永不再问");
                                    } else {
-                                       // Denied permission with ask never again
-                                       // Need to go to the settings
-                                       Toast.makeText(MainActivity.this,
-                                               "Permission denied, can't enable the camera",
-                                               Toast.LENGTH_SHORT).show();
+                                       showToast("权限被拒绝，无法启用相机，请去Setting页打开。");
                                    }
                                }
                            },
                         new Consumer<Throwable>() {
                             @Override
                             public void accept(Throwable t) {
-                                Log.e(TAG, "onError", t);
+                                Log.e("  --MainActivity--  ", " onError ", t);
                             }
                         },
                         new Action() {
                             @Override
                             public void run() {
-                                Log.i(TAG, "OnComplete");
+                                Log.i("  --MainActivity-- ", " OnComplete ");
                             }
                         });
     }
@@ -98,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
             camera.release();
             camera = null;
         }
+    }
+
+    public void showToast(CharSequence text){
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
 }

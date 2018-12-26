@@ -15,13 +15,12 @@ import java.util.Map;
 import io.reactivex.subjects.PublishSubject;
 
 public class RxPermissionsFragment extends Fragment {
-
     private static final int PERMISSIONS_REQUEST_CODE = 42;
 
     // Contains all the current permission requests.
     // Once granted or denied, they are removed from it.
     private Map<String, PublishSubject<Permission>> mSubjects = new HashMap<>();
-    private boolean mLogging;
+    private boolean mLogging = false;// 是否开启Log
 
     public RxPermissionsFragment() {
     }
@@ -29,7 +28,7 @@ public class RxPermissionsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        setRetainInstance(true);// 保留实例
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -43,18 +42,25 @@ public class RxPermissionsFragment extends Fragment {
 
         if (requestCode != PERMISSIONS_REQUEST_CODE) return;
 
-        boolean[] shouldShowRequestPermissionRationale = new boolean[permissions.length];
+        boolean[] neverAskAgain = new boolean[permissions.length];
 
         for (int i = 0; i < permissions.length; i++) {
-            shouldShowRequestPermissionRationale[i] = shouldShowRequestPermissionRationale(permissions[i]);
+            neverAskAgain[i] = shouldShowRequestPermissionRationale(permissions[i]);
         }
 
-        onRequestPermissionsResult(permissions, grantResults, shouldShowRequestPermissionRationale);
+        onRequestPermissionsResult(permissions, grantResults, neverAskAgain);
     }
 
-    void onRequestPermissionsResult(String permissions[], int[] grantResults, boolean[] shouldShowRequestPermissionRationale) {
+    /**
+     * 请求权限结果
+     *
+     * @param permissions   - 权限列表
+     * @param grantResults  - 同意列表
+     * @param neverAskAgain - 永不再问列表
+     */
+    void onRequestPermissionsResult(String permissions[], int[] grantResults, boolean[] neverAskAgain) {
         for (int i = 0, size = permissions.length; i < size; i++) {
-            log("onRequestPermissionsResult  " + permissions[i]);
+            log("请求权限结果：  " + permissions[i]);
             // Find the corresponding subject
             PublishSubject<Permission> subject = mSubjects.get(permissions[i]);
             if (subject == null) {
@@ -64,11 +70,12 @@ public class RxPermissionsFragment extends Fragment {
             }
             mSubjects.remove(permissions[i]);
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
-            subject.onNext(new Permission(permissions[i], granted, shouldShowRequestPermissionRationale[i]));
+            subject.onNext(new Permission(permissions[i], granted, neverAskAgain[i]));
             subject.onComplete();
         }
     }
 
+    // 是否同意权限
     @TargetApi(Build.VERSION_CODES.M)
     boolean isGranted(String permission) {
         final FragmentActivity fragmentActivity = getActivity();
@@ -78,6 +85,7 @@ public class RxPermissionsFragment extends Fragment {
         return fragmentActivity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+    // 是否撤销权限
     @TargetApi(Build.VERSION_CODES.M)
     boolean isRevoked(String permission) {
         final FragmentActivity fragmentActivity = getActivity();
@@ -85,10 +93,6 @@ public class RxPermissionsFragment extends Fragment {
             throw new IllegalStateException("This fragment must be attached to an activity.");
         }
         return fragmentActivity.getPackageManager().isPermissionRevokedByPolicy(permission, getActivity().getPackageName());
-    }
-
-    public void setLogging(boolean logging) {
-        mLogging = logging;
     }
 
     public PublishSubject<Permission> getSubjectByPermission(@NonNull String permission) {
@@ -103,9 +107,14 @@ public class RxPermissionsFragment extends Fragment {
         mSubjects.put(permission, subject);
     }
 
+    // 是否开启Log
+    public void setLogging(boolean logging) {
+        mLogging = logging;
+    }
+
     void log(String message) {
         if (mLogging) {
-            Log.d(RxPermissions.TAG, message);
+            Log.e(" ---RxPerFragment--- ", "  message ：  " + message);
         }
     }
 
