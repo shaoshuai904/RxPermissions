@@ -52,9 +52,8 @@ public class RxPermissions {
     }
 
     private RxPermissionsFragment getRxPermissionsFragment(@NonNull final FragmentManager fragmentManager) {
-        RxPermissionsFragment rxPermissionsFragment = findRxPermissionsFragment(fragmentManager);
-        boolean isNewInstance = rxPermissionsFragment == null;
-        if (isNewInstance) {
+        RxPermissionsFragment rxPermissionsFragment = (RxPermissionsFragment) fragmentManager.findFragmentByTag(TAG);
+        if (rxPermissionsFragment == null) {
             rxPermissionsFragment = new RxPermissionsFragment();
             fragmentManager
                     .beginTransaction()
@@ -62,10 +61,6 @@ public class RxPermissions {
                     .commitNow();
         }
         return rxPermissionsFragment;
-    }
-
-    private RxPermissionsFragment findRxPermissionsFragment(@NonNull final FragmentManager fragmentManager) {
-        return (RxPermissionsFragment) fragmentManager.findFragmentByTag(TAG);
     }
 
     public void setLogging(boolean logging) {

@@ -7,31 +7,28 @@ import io.reactivex.functions.BiConsumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
-/**
- * 权限
- *
- * @author maple
- * @time 2018/12/26
- */
 public class Permission {
     public final String name;// 权限名
     public final boolean granted;// 是否同意
-    public final boolean neverAskAgain;// 是否永不再问（被拒绝过一次，是否勾选“下次不在询问”）
+    public final boolean shouldShowRequestPermissionRationale;// true =（被拒绝过一次，没勾选“下次不在询问”）
+    // 第一次打开App时     false
+    // 上次弹出权限点击了禁止（但没有勾选“下次不在询问”）   true
+    // 上次选择禁止并勾选：下次不在询问     false
 
     public Permission(String name, boolean granted) {
         this(name, granted, false);
     }
 
-    public Permission(String name, boolean granted, boolean neverAskAgain) {
+    public Permission(String name, boolean granted, boolean shouldShowRequestPermissionRationale) {
         this.name = name;
         this.granted = granted;
-        this.neverAskAgain = neverAskAgain;
+        this.shouldShowRequestPermissionRationale = shouldShowRequestPermissionRationale;
     }
 
     public Permission(List<Permission> permissions) {
         name = combineName(permissions);
         granted = combineGranted(permissions);
-        neverAskAgain = combineNeverAskAgain(permissions);
+        shouldShowRequestPermissionRationale = combineShouldShowRequestPermissionRationale(permissions);
     }
 
     @Override
@@ -43,7 +40,7 @@ public class Permission {
         final Permission that = (Permission) o;
 
         if (granted != that.granted) return false;
-        if (neverAskAgain != that.neverAskAgain)
+        if (shouldShowRequestPermissionRationale != that.shouldShowRequestPermissionRationale)
             return false;
         return name.equals(that.name);
     }
@@ -52,7 +49,7 @@ public class Permission {
     public int hashCode() {
         int result = name.hashCode();
         result = 31 * result + (granted ? 1 : 0);
-        result = 31 * result + (neverAskAgain ? 1 : 0);
+        result = 31 * result + (shouldShowRequestPermissionRationale ? 1 : 0);
         return result;
     }
 
@@ -61,21 +58,20 @@ public class Permission {
         return "Permission{" +
                 "name='" + name + '\'' +
                 ", granted=" + granted +
-                ", neverAskAgain=" + neverAskAgain +
+                ", shouldShowRequestPermissionRationale=" + shouldShowRequestPermissionRationale +
                 '}';
     }
 
-    // 结合 name
     private String combineName(List<Permission> permissions) {
         return Observable.fromIterable(permissions)
                 .map(new Function<Permission, String>() {
                     @Override
-                    public String apply(Permission permission) {
+                    public String apply(Permission permission) throws Exception {
                         return permission.name;
                     }
                 }).collectInto(new StringBuilder(), new BiConsumer<StringBuilder, String>() {
                     @Override
-                    public void accept(StringBuilder s, String s2) {
+                    public void accept(StringBuilder s, String s2) throws Exception {
                         if (s.length() == 0) {
                             s.append(s2);
                         } else {
@@ -89,18 +85,18 @@ public class Permission {
         return Observable.fromIterable(permissions)
                 .all(new Predicate<Permission>() {
                     @Override
-                    public boolean test(Permission permission) {
+                    public boolean test(Permission permission) throws Exception {
                         return permission.granted;
                     }
                 }).blockingGet();
     }
 
-    private Boolean combineNeverAskAgain(List<Permission> permissions) {
+    private Boolean combineShouldShowRequestPermissionRationale(List<Permission> permissions) {
         return Observable.fromIterable(permissions)
                 .any(new Predicate<Permission>() {
                     @Override
-                    public boolean test(Permission permission) {
-                        return permission.neverAskAgain;
+                    public boolean test(Permission permission) throws Exception {
+                        return permission.shouldShowRequestPermissionRationale;
                     }
                 }).blockingGet();
     }

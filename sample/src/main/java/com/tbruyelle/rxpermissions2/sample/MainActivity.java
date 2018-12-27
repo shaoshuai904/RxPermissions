@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                                        } catch (IOException e) {
                                            Log.e("  --MainActivity--  ", " Error while trying to display the camera preview", e);
                                        }
-                                   } else if (permission.neverAskAgain) {
+                                   } else if (permission.shouldShowRequestPermissionRationale) {
                                        showToast("拒绝许可，永不再问");
                                    } else {
                                        showToast("权限被拒绝，无法启用相机，请去Setting页打开。");
