@@ -6,8 +6,7 @@ android {
     defaultConfig {
         applicationId "com.tbruyelle.rxpermissions.sample"
         minSdkVersion 14
-
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
